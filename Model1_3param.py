@@ -90,8 +90,6 @@ for mouse in range(2, (ns - 1)):
     parOPT = fmin(xhi2_ogttU, par0, args=(tspan, yd, a))
     yabs = compute_absorption(parOPT, Gi0)
     params_calib  = [mouse-1, xhi2_ogttU(parOPT, tspan, yd, Gi0), yabs, parOPT]
-    AIC2 = [49 * np.log(xhi2_ogttU(parOPT, tspan, yd, a) / 49) + 6]
     print("params_calib = ", params_calib)
-    print("AIC2 : ", AIC2)
     #sname = 'figs/full_U_{}.pdf'.format(mouse - 1)
     #plt.savefig(sname)
