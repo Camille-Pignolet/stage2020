@@ -43,7 +43,7 @@ def compute_absorption (par, Gi0, ):
     return ya
 
 
-full_ogtt = np.loadtxt("full_ogtt_2param.txt")
+full_ogtt = np.loadtxt("full_ogtt.txt")
 
 tspan = np.linspace(0, 500, 49)
 times = full_ogtt[:, 0]

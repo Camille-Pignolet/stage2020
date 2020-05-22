@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import fmin
 from scipy.integrate import odeint
-import scipy.io
-
 
 
 # Modèle 1 : Code 2 (3 paramètres, boucle mu)
@@ -50,7 +48,7 @@ def compute_absorption (par, Gi0):
     return ya
 
 
-full_ogtt = np.loadtxt("full_ogtt_3paramMU.txt")
+full_ogtt = np.loadtxt("full_ogtt_MU.txt")
 
 tspan = np.linspace(0, 500, 49)
 times = np.array(full_ogtt[:, 0])
