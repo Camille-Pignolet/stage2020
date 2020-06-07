@@ -59,38 +59,27 @@ with open('OGTT Doses croissantes.csv', newline='') as csvfile:
             Dose_data.append((int(row[column]), int(row[column+1]), int(row[column+2])))
 
     data_1g = ([], [], [])
-    data_1g_MOY = []
     data_2g = ([], [], [])
-    data_2g_MOY = []
     data_3g = ([], [], [])
-    data_3g_MOY = []
     data_4g = ([], [], [])
-    data_4g_MOY = []
     dose_data_index = 0
     for x in range(len(times)):
         data_1g[0].append(Dose_data[dose_data_index][0])
         data_1g[1].append(Dose_data[dose_data_index][1])
         data_1g[2].append(Dose_data[dose_data_index][2])
-        X1 = (data_1g[0][-1] + data_1g[1][-1] + data_1g[2][-1]) / 3
-        data_1g_MOY.append(X1)
 
         data_2g[0].append(Dose_data[dose_data_index+1][0])
         data_2g[1].append(Dose_data[dose_data_index+1][1])
         data_2g[2].append(Dose_data[dose_data_index+1][2])
-        X2 = (data_2g[0][-1] + data_2g[1][-1] + data_2g[2][-1]) / 3
-        data_2g_MOY.append(X2)
 
         data_3g[0].append(Dose_data[dose_data_index + 2][0])
         data_3g[1].append(Dose_data[dose_data_index + 2][1])
         data_3g[2].append(Dose_data[dose_data_index + 2][2])
-        X3 = (data_3g[0][-1] + data_3g[1][-1] + data_3g[2][-1]) / 3
-        data_3g_MOY.append(X3)
 
         data_4g[0].append(Dose_data[dose_data_index + 3][0])
         data_4g[1].append(Dose_data[dose_data_index + 3][1])
         data_4g[2].append(Dose_data[dose_data_index + 3][2])
-        X4 = (data_4g[0][-1] + data_4g[1][-1] + data_4g[2][-1]) / 3
-        data_4g_MOY.append(X4)
+
         dose_data_index += 4
 
 
@@ -122,7 +111,12 @@ b = 5.15E-006
 U0 = 0.003743
 
 for mouse in range(0, 2):
-    yd = data_1g_MOY
+    if mouse == 0 :
+        yd = data_1g[0]
+    elif mouse == 1 :
+        yd = data_1g[1]
+    elif mouse == 2 :
+        yd = data_1g[2]
     G0 = yd[0]
     Gmin = G0
     Gb = yd[-1]
@@ -132,11 +126,16 @@ for mouse in range(0, 2):
     par0 = [5E-06, yd[-1], 0.004]
     parOPT = fmin(xhi2_ogttU, par0, args=(tspan, yd, a))
     yabs = compute_absorption(parOPT, Gi0)
-    params_doses_1g = [mouse - 1, xhi2_ogttU(parOPT,tspan, yd, Gi0), yabs, parOPT]
+    params_doses_1g = [mouse - 1, xhi2_ogttU(parOPT, tspan, yd, Gi0), yabs, parOPT]
 
 
 for mouse in range(3, 5):
-    yd = data_2g_MOY
+    if mouse == 3:
+        yd = data_2g[0]
+    elif mouse == 4:
+        yd = data_2g[1]
+    elif mouse == 5:
+        yd = data_2g[2]
     G0 = yd[0]
     Gmin = G0
     Gb = yd[-1]
@@ -150,7 +149,12 @@ for mouse in range(3, 5):
 
 
 for mouse in range(6, 8):
-    yd = data_3g_MOY
+    if mouse == 6:
+        yd = data_3g[0]
+    elif mouse == 7:
+        yd = data_3g[1]
+    elif mouse == 8:
+        yd = data_3g[2]
     G0 = yd[0]
     Gmin = G0
     Gb = yd[-1]
@@ -164,7 +168,12 @@ for mouse in range(6, 8):
 
 
 for mouse in range(9, 11):
-    yd = data_4g_MOY
+    if mouse == 9:
+        yd = data_4g[0]
+    elif mouse == 10:
+        yd = data_4g[1]
+    elif mouse == 21:
+        yd = data_4g[2]
     G0 = yd[0]
     Gmin = G0
     Gb = yd[-1]
@@ -179,30 +188,38 @@ for mouse in range(9, 11):
 
 # plot des fits
 plt.subplot(221)
-plt.plot(times, data_1g_MOY, "r.", label="data")
-plt.plot(times, y1[:, 1], "g-", label="model")
+plt.plot(times, data_1g[0], "r.", label="data")
+plt.plot(times, data_1g[1], "g.", label="data")
+plt.plot(times, data_1g[2], "m.", label="data")
+plt.plot(times, y1[:, 1], "-", label="model")
 plt.ylabel('')
 plt.legend()
 plt.title("1g/kg")
 
 plt.subplot(222)
-plt.plot(times, data_2g_MOY, "r.", label="data")
-plt.plot(times, y2[:, 1], "g-", label="model")
+plt.plot(times, data_2g[0], "r.", label="data")
+plt.plot(times, data_2g[1], "g.", label="data")
+plt.plot(times, data_2g[2], "m.", label="data")
+plt.plot(times, y2[:, 1], "-", label="model")
 plt.ylabel('')
 plt.legend()
 plt.title("2g/kg")
 
 plt.subplot(223)
-plt.plot(times, data_3g_MOY, "r.", label="data")
-plt.plot(times, y3[:, 1], "g-", label="model")
+plt.plot(times, data_3g[0], "r.", label="data")
+plt.plot(times, data_3g[1], "g.", label="data")
+plt.plot(times, data_3g[2], "m.", label="data")
+plt.plot(times, y3[:, 1], "-", label="model")
 plt.xlabel('min')
 plt.ylabel('')
 plt.legend()
 plt.title("3g/kg")
 
 plt.subplot(224)
-plt.plot(times, data_4g_MOY, "r.", label="data")
-plt.plot(times, y4[:, 1], "g-", label="model")
+plt.plot(times, data_4g[0], "r.", label="data")
+plt.plot(times, data_4g[1], "g.", label="data")
+plt.plot(times, data_4g[2], "m.", label="data")
+plt.plot(times, y4[:, 1], "-", label="model")
 plt.xlabel('min')
 plt.ylabel('')
 plt.legend()
@@ -217,4 +234,17 @@ print("params_2g = ", params_doses_2g)
 print("params_3g = ", params_doses_3g)
 print("params_4g = ", params_doses_4g)
 
+XHI2 = (params_doses_1g[1]+params_doses_2g[1]+params_doses_3g[1]+params_doses_4g[1])/4
+YABS = (params_doses_1g[2]+params_doses_2g[2]+params_doses_3g[2]+params_doses_4g[2])/4
+B = (params_doses_1g[3][0]+params_doses_2g[3][0]+params_doses_3g[3][0]+params_doses_4g[3][0])/4
+MU = (params_doses_1g[3][1]+params_doses_2g[3][1]+params_doses_3g[3][1]+params_doses_4g[3][1])/4
+UO = (params_doses_1g[3][2]+params_doses_2g[3][2]+params_doses_3g[3][2]+params_doses_4g[3][2])/4
 
+plt.subplot(121)
+plt.bar(range(2), [XHI2, YABS])
+plt.xticks(range(2), ['XHI2', 'yabs'])
+
+plt.subplot(122)
+plt.bar(range(3), [B, MU, UO])
+plt.xticks(range(3), ['b', 'MU', 'U0'])
+plt.show()
