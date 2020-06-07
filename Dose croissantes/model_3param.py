@@ -172,7 +172,7 @@ for mouse in range(9, 11):
         yd = data_4g[0]
     elif mouse == 10:
         yd = data_4g[1]
-    elif mouse == 21:
+    elif mouse == 11:
         yd = data_4g[2]
     G0 = yd[0]
     Gmin = G0
