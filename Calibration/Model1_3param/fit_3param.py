@@ -44,7 +44,7 @@ def compute_absorption (par, Gi0):
 
 full_ogtt = np.loadtxt("full_ogtt.txt")
 
-tspan = np.linspace(0, 500, 49)
+tspan = np.linspace(0, 180, 49)
 times = full_ogtt[:, 0]
 
 AIC2 = []
@@ -79,10 +79,10 @@ for mouse in range(2, (ns - 1)):
     X0 = [Gi0, G0, I0, U0]
     y = odeint(dGdIdU, X0, tspan, args=(a, b, Gb))
 
-    plt.plot(times, yd, 'go', label="data")
-    plt.plot(tspan, y[:, 1], "k-", label="model")
-    plt.xlabel('Time(min)')
-    plt.ylabel('Glucose(mg/dl)')
+    plt.plot(times, yd, 'b.', label="Données")
+    plt.plot(tspan, y[:, 1], "k-", label="Modèle")
+    plt.xlabel('Temps (min)')
+    plt.ylabel('Glucose (mg/dl)')
     plt.legend()
     plt.show()
 
