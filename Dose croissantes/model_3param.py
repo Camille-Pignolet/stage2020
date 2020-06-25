@@ -191,7 +191,7 @@ plt.subplot(221)
 plt.plot(times, data_1g[0], "r.", label="data")
 plt.plot(times, data_1g[1], "g.", label="data")
 plt.plot(times, data_1g[2], "m.", label="data")
-plt.plot(times, y1[:, 1], "-", label="model")
+plt.plot(times, y1[:, 1], "k-", label="model")
 plt.ylabel('')
 plt.legend()
 plt.title("1g/kg")
@@ -200,7 +200,7 @@ plt.subplot(222)
 plt.plot(times, data_2g[0], "r.", label="data")
 plt.plot(times, data_2g[1], "g.", label="data")
 plt.plot(times, data_2g[2], "m.", label="data")
-plt.plot(times, y2[:, 1], "-", label="model")
+plt.plot(times, y2[:, 1], "k-", label="model")
 plt.ylabel('')
 plt.legend()
 plt.title("2g/kg")
@@ -209,7 +209,7 @@ plt.subplot(223)
 plt.plot(times, data_3g[0], "r.", label="data")
 plt.plot(times, data_3g[1], "g.", label="data")
 plt.plot(times, data_3g[2], "m.", label="data")
-plt.plot(times, y3[:, 1], "-", label="model")
+plt.plot(times, y3[:, 1], "k-", label="model")
 plt.xlabel('min')
 plt.ylabel('')
 plt.legend()
@@ -219,7 +219,7 @@ plt.subplot(224)
 plt.plot(times, data_4g[0], "r.", label="data")
 plt.plot(times, data_4g[1], "g.", label="data")
 plt.plot(times, data_4g[2], "m.", label="data")
-plt.plot(times, y4[:, 1], "-", label="model")
+plt.plot(times, y4[:, 1], "k-", label="model")
 plt.xlabel('min')
 plt.ylabel('')
 plt.legend()
@@ -234,17 +234,28 @@ print("params_2g = ", params_doses_2g)
 print("params_3g = ", params_doses_3g)
 print("params_4g = ", params_doses_4g)
 
-XHI2 = (params_doses_1g[1]+params_doses_2g[1]+params_doses_3g[1]+params_doses_4g[1])/4
-YABS = (params_doses_1g[2]+params_doses_2g[2]+params_doses_3g[2]+params_doses_4g[2])/4
-B = (params_doses_1g[3][0]+params_doses_2g[3][0]+params_doses_3g[3][0]+params_doses_4g[3][0])/4
-MU = (params_doses_1g[3][1]+params_doses_2g[3][1]+params_doses_3g[3][1]+params_doses_4g[3][1])/4
-UO = (params_doses_1g[3][2]+params_doses_2g[3][2]+params_doses_3g[3][2]+params_doses_4g[3][2])/4
+ABS1 = (params_doses_1g[2] *100) /1100
+ABS2 = (params_doses_2g[2] *100) /2100
+ABS3 = (params_doses_3g[2] *100) /3100
+ABS4 = (params_doses_4g[2] *100) /4100
+
+etabs = [0.01413, 0.01596, 0.00628, 0.00581, 0.00780, 0.00407, 0.00721, 0.00524, 0.00436, 0.00397, 0.00376, 0.00222]
+etbeta = [8.6792E-06, 1.4157E-05, 6.3092E-06, 7.3752E-06, 1.3554E-05, 1.6829E-05, 3.7225E-06, 8.4829E-06, 7.6141E-06, 5.8695E-06, 4.4009E-06, 5.5614E-06]
+SEM1 = np.std(etabs, axis=0)/np.sqrt(12)
+SEM2 = np.std(etbeta, axis=0)/np.sqrt(12)
+
+B1 = params_doses_1g[3][0]
+B2 = params_doses_2g[3][0]
+B3 = params_doses_3g[3][0]
+B4 = params_doses_4g[3][0]
 
 plt.subplot(121)
-plt.bar(range(2), [XHI2, YABS])
-plt.xticks(range(2), ['XHI2', 'yabs'])
+plt.bar(range(4), [ABS1, ABS2, ABS3, ABS4], color = ['yellow', 'blue', 'orange', 'pink'], edgecolor = 'black', yerr = SEM1, ecolor = 'black', capsize = 5)
+plt.xticks(range(4), ['1g/kg', '2g/kg', '3g/kg', '4g/kg'])
+plt.title("% d'Absorption")
 
 plt.subplot(122)
-plt.bar(range(3), [B, MU, UO])
-plt.xticks(range(3), ['b', 'MU', 'U0'])
+plt.bar(range(4), [B1, B2, B3, B4], color = ['yellow', 'blue', 'orange', 'pink'], edgecolor = 'black', yerr = SEM2, ecolor = 'black', capsize = 5)
+plt.xticks(range(4), ['1g/kg', '2g/kg', '3g/kg', '4g/kg'])
+plt.title("Sensibilité à l'insuline (min-1)")
 plt.show()
