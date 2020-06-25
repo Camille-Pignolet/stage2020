@@ -1,0 +1,173 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import fmin
+from scipy.integrate import odeint
+
+# Modèle 3 params
+def dGdIdU (X, t, a, b, Gb):
+    Gi = X[0]
+    Gs = X[1]
+    I = X[2]
+    U = X[3]
+    dU = - mu * U
+    dI = np.maximum(Gs - Gmin, 0) - a * (I - Ib)
+    dGi = - U * Gi
+    dGs = U * Gi  - b * I * Gs + np.maximum(Gb - Gs, 0)
+    return [dGi, dGs, dI, dU]
+
+
+def xhi2_ogttU (par, t, yd, Gi0):
+    b = par[0]
+    Gb = par[1]
+    U0 = par[2]
+    y = odeint(dGdIdU, X0, tspan, args=(a, b, Gb))
+    if len(yd) != len(y):
+        xhi2 = 1e6
+    else :
+        xhi2 = sum((y[:, 1] - yd) ** 2) / len(yd)
+
+    if len(par < 0) > 0 :
+        xhi2 = xhi2 + 1e5 * len(par < 0)
+
+    if Gb < 70 :
+        xhi2 = xhi2 + 1e5
+    return xhi2
+
+
+def compute_absorption (par, Gi0):
+    b = par[0]
+    Gb = par[1]
+    U0 = par[2]
+    y = odeint(dGdIdU, X0, tspan, args=(a, b, Gb))
+    ya = Gi0 - y[-1, 1]
+    return ya
+
+
+# Import data
+data_controle = np.loadtxt("ctrl.txt")
+data_ko = np.loadtxt("ko.txt")
+times = data_controle[:, 0]
+tspan = np.linspace(0, 120, 6)
+
+params_CTRL = []
+params_KO = []
+param_c = [1,	422.98,	972.85,	3.0883E-05,	115.573,	0.004434,	21.6189,
+2,	88.48,	1169.15,	1.4982E-05,	165.189,	0.005476,	25.9811,
+3,	1065.78,	1345.47,	1.4409E-05,	132.906,	0.006466,	29.8993,
+4,	170.25,	898.53,	3.0947E-05,	148.969,	0.004054,	19.9674,
+5,	1200.22,	707.94,	1.1534E-05,	168.649,	0.003116,	15.7319,
+6,	186.22,	881.55,	5.6320E-06,	168.955,	0.003969,	19.5900,
+7,	418.80,	1145.94,	2.2029E-05,	126.129,	0.005350,	25.4653,
+8,	606.90,	1255.27,	1.2656E-05,	83.012,	0.005953,	27.8949,
+9,	646.25,	1287.75,	2.1227E-05,	102.113,	0.006136,	28.6167,
+10,	779.27,	1220.46,	2.2640E-05,	134.953,	0.005759,	27.1214,
+11,	268.60,	862.28,	3.5006E-05,	202.191,	0.003872,	19.1617,
+12,	657.02,	812.58,	3.5274E-05,	209.054,	0.003625,	18.0572,
+13,	243.44,	209.01,	2.6588E-05,	160.208,	0.000866,	4.6446,
+14,	213.71,	1218.31,	1.9544E-05,	167.578,	0.005747,	27.0736,
+15,	267.64,	841.64,	1.7354E-05,	240.666,	0.003769,	18.7030,
+16,	499.61,	893.38,	2.0420E-05,	171.555,	0.004028,	19.8528]
+
+param_ko = [1,	94.79,	487.88,	1.5318E-05,	143.753,	0.002089,	10.8417,
+2,	570.01,	405.80,	4.7364E-06,	115.914,	0.001720,	9.0179,
+3,	661.15,	854.27,	2.4471E-05,	161.849,	0.003832,	18.9837,
+4,	179.19,	497.50,	8.2982E-06,	169.673, 0.002133,	11.0555,
+5,	450.16,	385.61,	1.0136E-05,	150.997,	0.001631,	8.5691,
+6,	1621.15,	539.89,	3.6528E-06,	183.503,	0.002326,	11.9976,
+7,	780.61,	853.90,	2.3862E-05,	204.631,	0.003830,	18.9757,
+8,	400.23,	719.61,	3.4934E-05,	208.312, 0.003172,	15.9913,
+9,	371.04,	203.60,	2.0988E-05,	141.601,	0.000843,	4.5245,
+10,	124.21,	453.33,	8.7369E-06,	167.176,	0.001933,	10.0741,
+11,	117.28,	620.88,	3.7515E-05,	196.715,	0.002702,	13.7973,
+12,	321.92,	695.62,	5.8239E-05,	205.378,	0.003057,	15.4582]
+
+[nx, ns] = data_controle.shape
+[ny, nr] = data_ko.shape
+
+for mouse in range(2, ns):
+    yd1 = data_controle[:, mouse]
+    I0 = 10
+    Ib = 10
+    G0 = yd1[0]
+    Gmin = G0
+    Gb = yd1[-1]
+    Gi0 = 4500
+    a = 1 / 30.0
+
+    mu = 0.0182
+    b = 5.15E-006
+    U0 = 0.003743
+
+    X0 = [Gi0, G0, I0, U0]
+    y1= odeint(dGdIdU, X0, tspan, args=(a, b, Gb))
+
+    par0 = [9e-06, 80, 0.007]
+    parOPT = fmin(xhi2_ogttU, par0, args=(tspan, yd1, a))
+    yabs = compute_absorption(parOPT, Gi0)
+    params_CTRL = [mouse - 1, xhi2_ogttU(parOPT, tspan, yd1, Gi0), yabs, parOPT]
+
+
+for mouse in range(2, nr):
+    yd2 = data_ko[:, mouse]
+    I0 = 10
+    Ib = 10
+    G0 = yd2[0]
+    Gmin = G0
+    Gb = yd2[-1]
+    Gi0 = 4500
+    a = 1 / 30.0
+
+    mu = 0.0182
+    b = 5.15E-006
+    U0 = 0.003743
+
+    X0 = [Gi0, G0, I0, U0]
+    y2 = odeint(dGdIdU, X0, tspan, args=(a, b, Gb))
+
+    par0 = [9e-06, 80, 0.007]
+    parOPT = fmin(xhi2_ogttU, par0, args=(tspan, yd2, a))
+    yabs = compute_absorption(parOPT, Gi0)
+    params_KO = [mouse - 1, xhi2_ogttU(parOPT, tspan, yd2, Gi0), yabs, parOPT]
+
+    plt.plot(times, yd1, 'b--', label="Données CTRL")
+    plt.plot(tspan, y1[:, 1], "k-", label="Model CTRL")
+    plt.plot(times, yd2, 'r--', label="Données KO")
+    plt.plot(tspan, y2[:, 1], "r-", label="Model KO")
+    plt.xlabel('Temps (min)')
+    plt.ylabel('Glucose (mg/dl)')
+    plt.legend()
+    #plt.show()
+
+
+#liste des paramètres
+print("params_ctrl = ", params_CTRL)
+print("params_ko = ", params_KO)
+
+ABS1 = (params_CTRL[2] *100) /2100
+ABS2 = (params_KO[2] *100) /2100
+B1 = params_CTRL[3][0]
+B2 = params_KO[3][0]
+
+absc = [21.6189, 25.9811, 29.8993, 19.9674, 15.7319, 19.5900, 25.4653, 27.8949, 28.6167, 27.1214, 19.1617, 18.0572, 27.0736, 18.7030, 19.8528]
+absko = [10.8417, 9.0179, 18.9837, 11.0555, 8.5691, 11.9976, 18.9757, 15.9913, 4.5245, 10.0741, 13.7973, 15.4582]
+SEM1 = np.std(absc, axis=0)/np.sqrt(len(absc))
+SEM2 = np.std(absko, axis=0)/np.sqrt(len(absko))
+
+Bc = [3.0883E-05, 1.4982E-05, 1.4409E-05, 3.0947E-05, 1.1534E-05, 5.6320E-06, 2.2029E-05, 1.2656E-05, 2.1227E-05, 2.2640E-05, 3.5006E-05, 3.5274E-05, 2.6588E-05, 1.9544E-05, 1.7354E-05, 2.0420E-05]
+Bko = [1.5318E-05, 4.7364E-06, 2.4471E-05, 8.2982E-06, 1.0136E-05, 3.6528E-06, 2.3862E-05, 3.4934E-05, 2.0988E-05, 8.7369E-06, 3.7515E-05, 5.8239E-05]
+SEM3 = np.std(Bc, axis=0)/np.sqrt(len(Bc))
+SEM4 = np.std(Bko, axis=0)/np.sqrt(len(Bko))
+
+plt.subplot(121)
+plt.bar(range(2), [ABS1, ABS2], color = ['blue', 'orange'], edgecolor = 'black', yerr = [SEM1, SEM2], ecolor = 'black', capsize = 5)
+plt.xticks(range(2), ['CTRL', 'KO-GLUT2'])
+plt.title("% d'Absorption (2g/kg)")
+
+plt.subplot(122)
+plt.bar(range(2), [B1, B2], color = ['blue', 'orange'], edgecolor = 'black', yerr = [SEM3, SEM4], ecolor = 'black', capsize = 5)
+plt.xticks(range(2), ['CTRL', 'KO-GLUT2'])
+plt.title("Sensibilité à l'insuline (min-1)")
+plt.show()
+
+
+
