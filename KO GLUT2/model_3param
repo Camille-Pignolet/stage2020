@@ -39,7 +39,7 @@ def compute_absorption (par, Gi0):
     Gb = par[1]
     U0 = par[2]
     y = odeint(dGdIdU, X0, tspan, args=(a, b, Gb))
-    ya = Gi0 - y[-1, 1]
+    ya = Gi0 - y[-1, 0]
     return ya
 
 
@@ -84,7 +84,7 @@ param_ko = [1,	94.79,	487.88,	1.5318E-05,	143.753,	0.002089,	10.8417,
 [nx, ns] = data_controle.shape
 [ny, nr] = data_ko.shape
 
-for mouse in range(2, ns):
+for mouse in range(1, ns):
     yd1 = data_controle[:, mouse]
     I0 = 10
     Ib = 10
@@ -107,7 +107,7 @@ for mouse in range(2, ns):
     params_CTRL = [mouse - 1, xhi2_ogttU(parOPT, tspan, yd1, Gi0), yabs, parOPT]
 
 
-for mouse in range(2, nr):
+for mouse in range(1, nr):
     yd2 = data_ko[:, mouse]
     I0 = 10
     Ib = 10
@@ -140,15 +140,15 @@ for mouse in range(2, nr):
 
 
 #liste des paramètres
-print("params_ctrl = ", params_CTRL)
-print("params_ko = ", params_KO)
+#print("params_ctrl = ", params_CTRL)
+#print("params_ko = ", params_KO)
 
-ABS1 = (params_CTRL[2] *100) /2100
-ABS2 = (params_KO[2] *100) /2100
-B1 = params_CTRL[3][0]
-B2 = params_KO[3][0]
+ABS1 = (9.8263E+02/4500) *100
+ABS2 = (5.5982E+02/4500) *100
+B1 = 2.1320E-05
+B2 = 2.0907E-05
 
-absc = [21.6189, 25.9811, 29.8993, 19.9674, 15.7319, 19.5900, 25.4653, 27.8949, 28.6167, 27.1214, 19.1617, 18.0572, 27.0736, 18.7030, 19.8528]
+absc = [21.6189, 25.9811, 29.8993, 19.9674, 15.7319, 19.5900, 25.4653, 27.8949, 28.6167, 27.1214, 19.1617, 18.0572, 4.6446, 27.0736, 18.7030, 19.8528]
 absko = [10.8417, 9.0179, 18.9837, 11.0555, 8.5691, 11.9976, 18.9757, 15.9913, 4.5245, 10.0741, 13.7973, 15.4582]
 SEM1 = np.std(absc, axis=0)/np.sqrt(len(absc))
 SEM2 = np.std(absko, axis=0)/np.sqrt(len(absko))
@@ -161,13 +161,10 @@ SEM4 = np.std(Bko, axis=0)/np.sqrt(len(Bko))
 plt.subplot(121)
 plt.bar(range(2), [ABS1, ABS2], color = ['blue', 'orange'], edgecolor = 'black', yerr = [SEM1, SEM2], ecolor = 'black', capsize = 5)
 plt.xticks(range(2), ['CTRL', 'KO-GLUT2'])
-plt.title("% d'Absorption (2g/kg)")
+plt.ylabel("% d'Absorption (2g/kg)").set_fontsize(16)
 
 plt.subplot(122)
 plt.bar(range(2), [B1, B2], color = ['blue', 'orange'], edgecolor = 'black', yerr = [SEM3, SEM4], ecolor = 'black', capsize = 5)
 plt.xticks(range(2), ['CTRL', 'KO-GLUT2'])
-plt.title("Sensibilité à l'insuline (min-1)")
+plt.ylabel("Sensibilité à l'insuline (min-1)").set_fontsize(16)
 plt.show()
-
-
-

@@ -41,7 +41,7 @@ def compute_absorption (par, Gi0):
     Gb = par[1]
     U0 = par[2]
     y = odeint(dGdIdU, X0, tspan, args=(a, b, Gb))
-    ya = Gi0 - y[-1, 1]
+    ya = Gi0 - y[-1, 0]
     return ya
 
 
@@ -89,19 +89,6 @@ params_doses_1g = []
 params_doses_2g = []
 params_doses_3g = []
 params_doses_4g = []
-
-param1 = [1, 701.882, 593.822, 8.6792E-06, 194.781, 0.01413,
-      2, 794.338, 642.349, 1.4157E-05, 220.166, 0.01596,
-      3, 224.128, 321.091, 6.3092E-06, 78.857, 0.00628,
-      4, 456.551, 601.538, 7.3752E-06, 109.040, 0.00581,
-      5, 1010.966, 766.977, 1.3554E-05, 200.659, 0.00780,
-      6, 1101.780, 440.344, 1.6829E-05, 250.056, 0.00407,
-      7, 386.188, 1078.973, 3.7225E-06, 169.888, 0.00721,
-      8, 1113.936, 825.796, 8.4829E-06, 78.675, 0.00524,
-      9, 668.195, 702.844, 7.6141E-06, 211.322, 0.00436,
-      10, 316.423, 861.955, 5.8695E-06, 183.933, 0.00397,
-      11, 769.925, 821.697, 4.4009E-06, 240.273, 0.00376,
-      12, 809.367, 504.726, 5.5614E-06, 252.410, 0.00222]
 
 I0 = 10
 Ib = 10
@@ -224,38 +211,48 @@ plt.xlabel('min')
 plt.ylabel('')
 plt.legend()
 plt.title("4g/kg")
-plt.show()
-plt.close()
+#plt.show()
+#plt.close()
 
 
 #liste des paramètres
-print("params_1g = ", params_doses_1g)
-print("params_2g = ", params_doses_2g)
-print("params_3g = ", params_doses_3g)
-print("params_4g = ", params_doses_4g)
+#print("params_1g = ", params_doses_1g)
+#print("params_2g = ", params_doses_2g)
+#print("params_3g = ", params_doses_3g)
+#print("params_4g = ", params_doses_4g)
 
-ABS1 = (params_doses_1g[2] *100) /1100
-ABS2 = (params_doses_2g[2] *100) /2100
-ABS3 = (params_doses_3g[2] *100) /3100
-ABS4 = (params_doses_4g[2] *100) /4100
+ABS = [47.198, 27.340, 26.354, 16.578]
+B = [9.7203E-06, 1.2567E-05, 6.6080E-06, 5.2766E-06]
 
-etabs = [0.01413, 0.01596, 0.00628, 0.00581, 0.00780, 0.00407, 0.00721, 0.00524, 0.00436, 0.00397, 0.00376, 0.00222]
-etbeta = [8.6792E-06, 1.4157E-05, 6.3092E-06, 7.3752E-06, 1.3554E-05, 1.6829E-05, 3.7225E-06, 8.4829E-06, 7.6141E-06, 5.8695E-06, 4.4009E-06, 5.5614E-06]
-SEM1 = np.std(etabs, axis=0)/np.sqrt(12)
-SEM2 = np.std(etbeta, axis=0)/np.sqrt(12)
+ET1100 = [54.01, 58.39, 29.19]
+ET2100 = [27.34, 34.76, 19.92]
+ET3100 = [32.74, 25.02, 21.30]
+ET4100 = [19.59, 18.67, 11.47]
 
-B1 = params_doses_1g[3][0]
-B2 = params_doses_2g[3][0]
-B3 = params_doses_3g[3][0]
-B4 = params_doses_4g[3][0]
+SEM1 = np.std(ET1100, axis=0)/np.sqrt(3)
+SEM2 = np.std(ET2100, axis=0)/np.sqrt(3)
+SEM3 = np.std(ET3100, axis=0)/np.sqrt(3)
+SEM4 = np.std(ET4100, axis=0)/np.sqrt(3)
 
 plt.subplot(121)
-plt.bar(range(4), [ABS1, ABS2, ABS3, ABS4], color = ['yellow', 'blue', 'orange', 'pink'], edgecolor = 'black', yerr = SEM1, ecolor = 'black', capsize = 5)
+plt.bar(range(4), ABS, color = ['yellow', 'blue', 'orange', 'pink'], edgecolor = 'black', yerr = [SEM1, SEM2, SEM3, SEM4], ecolor = 'black', capsize = 5)
 plt.xticks(range(4), ['1g/kg', '2g/kg', '3g/kg', '4g/kg'])
-plt.title("% d'Absorption")
+myText = plt.title("% d'Absorption")
+myText.set_fontsize(16)
+
+B1100 = [8.6938E-06, 1.4158E-05, 6.3092E-06]
+B2100 = [7.3752E-06, 1.3540E-05, 1.6787E-05]
+B3100 = [3.7270E-06, 8.4829E-06, 7.6141E-06]
+B4100 = [5.8683E-06, 4.4001E-06, 5.5614E-06]
+
+SEM5 = np.std(B1100, axis=0)/np.sqrt(3)
+SEM6 = np.std(B2100, axis=0)/np.sqrt(3)
+SEM7 = np.std(B3100, axis=0)/np.sqrt(3)
+SEM8 = np.std(B4100, axis=0)/np.sqrt(3)
 
 plt.subplot(122)
-plt.bar(range(4), [B1, B2, B3, B4], color = ['yellow', 'blue', 'orange', 'pink'], edgecolor = 'black', yerr = SEM2, ecolor = 'black', capsize = 5)
+plt.bar(range(4), B, color = ['yellow', 'blue', 'orange', 'pink'], edgecolor = 'black', yerr = [SEM5, SEM6, SEM7, SEM8], ecolor = 'black', capsize = 5)
 plt.xticks(range(4), ['1g/kg', '2g/kg', '3g/kg', '4g/kg'])
-plt.title("Sensibilité à l'insuline (min-1)")
+myText1 = plt.title("Sensibilité à l'insuline (min-1)")
+myText1.set_fontsize(16)
 plt.show()
